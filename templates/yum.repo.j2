@@ -3,6 +3,6 @@
 [{{ mysql_repo_uid }}]
 name = {{ mysql_repo_name }}
 baseurl = {{ mysql_repo_baseurl }}
-{% if mysql_repo_gpgkey %}gpgkey = {{ mysql_repo_gpgkey }}{% endif %}
+gpgkey = {{ mysql_repo_gpgkey }}
 gpgcheck = {{ mysql_repo_gpgcheck }}
 enabled = {{ mysql_repo_enabled }}
