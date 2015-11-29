@@ -95,7 +95,7 @@
     - mysql
 
 - name: MySQL | Debian | Install MySQL packages.
-  sudo: mysql
+  sudo: yes
   apt:
     name: '{{ item.name if item.version is not defined else item.name + "=" + item.version }}'
     cache_valid_time: '{{ item.cache_valid_time | default(omit) }}'
