@@ -1,0 +1,135 @@
+# This source file is subject to the (Open Source Initiative) BSD license
+# that is bundled with this package in the LICENSE file. It is also available
+# through the world-wide-web at this URL: http://www.ontic.com.au/license.html
+# If you did not receive a copy of the license and are unable to obtain it through
+# the world-wide-web, please send an email to license@ontic.com.au immediately.
+# Copyright (c) 2010-2015 Ontic. (http://www.ontic.com.au). All rights reserved.
+
+---
+
+- name: MySQL | Debian | Add launchpad PPA.
+  sudo: yes
+  apt_repository:
+    repo: '{{ mysql_ppa }}'
+    update_cache: yes
+  when: ansible_os_family == 'Debian' and mysql_ppa
+  tags:
+    - package
+    - mysql
+
+- name: MySQL | Debian | Update repository key.
+  sudo: yes
+  apt_key:
+    id: '{{ mysql_repo_key_id }}'
+    keyserver: '{{ mysql_repo_key_server }}'
+    state: '{{ mysql_repo_state }}'
+  register: mysql_key
+  when: ansible_os_family == 'Debian'
+  tags:
+    - package
+    - mysql
+
+- name: MySQL | Debian | Update repository list.
+  sudo: yes
+  apt_repository:
+    repo: '{{ mysql_repo_url }}'
+    state: '{{ mysql_repo_state }}'
+  register: mysql_list
+  when: ansible_os_family == 'Debian'
+  tags:
+    - package
+    - mysql
+
+- name: MySQL | Debian | Update APT cache.
+  sudo: yes
+  apt:
+    update_cache: yes
+  when: ansible_os_family == 'Debian' and (mysql_key.changed or mysql_list.changed)
+  tags:
+    - package
+    - mysql
+
+- name: PHP | RedHat | Remove absent repository.
+  sudo: yes
+  file:
+    path: '/etc/yum.repos.d/{{ mysql_repo_uid }}.repo'
+    state: absent
+  register: mysql_repo
+  when: ansible_os_family == 'RedHat' and mysql_repo_state | default('present') == 'absent'
+  tags:
+    - package
+    - nginx
+
+- name: MySQL | RedHat | Add present repository.
+  sudo: yes
+  template:
+    src: yum.repo.j2
+    dest: '/etc/yum.repos.d/{{ mysql_repo_uid }}.repo'
+    owner: root
+    group: root
+    mode: 0644
+  register: mysql_repo
+  when: ansible_os_family == 'RedHat' and mysql_repo_state | default('present') == 'present'
+  tags:
+    - package
+    - mysql
+
+- name: MySQL | Debian | Install MySQL Python package.
+  sudo: yes
+  apt:
+    pkg: python-mysqldb
+    state: present
+  when: ansible_os_family == 'Debian'
+  tags:
+    - package
+    - mysql
+
+- name: MySQL | RedHat | Install MySQL Python package.
+  sudo: yes
+  yum:
+    name: MySQL-python
+    state: present
+  when: ansible_os_family == 'RedHat'
+  tags:
+    - package
+    - mysql
+
+- name: MySQL | Debian | Install MySQL packages.
+  sudo: mysql
+  apt:
+    name: '{{ item.name if item.version is not defined else item.name + "=" + item.version }}'
+    cache_valid_time: '{{ item.cache_valid_time | default(omit) }}'
+    deb: '{{ item.deb | default(omit) }}'
+    default_release: '{{ item.default_release | default(omit) }}'
+    dpkg_options: '{{ item.dpkg_options | default(omit) }}'
+    force: '{{ item.force | default(omit) }}'
+    install_recommends: '{{ item.install_recommends | default(omit) }}'
+    purge: '{{ item.purge | default(omit) }}'
+    state: '{{ item.state | default(omit) }}'
+    update_cache: '{{ item.update_cache | default(omit) }}'
+    upgrade: '{{ item.upgrade | default(omit) }}'
+  register: mysql_installed_packages
+  with_items: mysql_packages
+  when: ansible_os_family == 'Debian' and mysql_packages
+  tags:
+    - package
+    - mysql
+
+- name: MySQL | RedHat | Install MySQL packages.
+  sudo: yes
+  yum:
+    name: '{{ item.name if item.version is not defined else item.name + "-" + item.version }}'
+    conf_file: '{{ item.conf_file | default(omit) }}'
+    disable_gpg_check: '{{ item.disable_gpg_check | default(omit) }}'
+    disablerepo: '{{ item.disablerepo | default(omit) }}'
+    enablerepo: '{{ item.enablerepo | default(omit) }}'
+    exclude: '{{ item.exclude | default(omit) }}'
+    list: '{{ item.list | default(omit) }}'
+    state: '{{ item.state | default(omit) }}'
+    update_cache: '{{ item.update_cache | default(omit) }}'
+  register: mysql_installed_packages
+  with_items: mysql_packages
+  when: ansible_os_family == 'RedHat' and mysql_packages
+  tags:
+    - package
+    - mysql

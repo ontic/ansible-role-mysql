@@ -1,0 +1,39 @@
+# This source file is subject to the (Open Source Initiative) BSD license
+# that is bundled with this package in the LICENSE file. It is also available
+# through the world-wide-web at this URL: http://www.ontic.com.au/license.html
+# If you did not receive a copy of the license and are unable to obtain it through
+# the world-wide-web, please send an email to license@ontic.com.au immediately.
+# Copyright (c) 2010-2015 Ontic. (http://www.ontic.com.au). All rights reserved.
+
+---
+
+mysql_ppa:
+mysql_version: 10.1
+mysql_repo_state: present
+mysql_repo_uid: mariadb
+mysql_repo_name: MariaDB
+mysql_repo_baseurl: http://yum.mariadb.org/{{ mysql_version }}/centos/{{ ansible_distribution_major_version }}/$basearch/
+mysql_repo_gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+mysql_repo_gpgcheck: 1
+mysql_repo_enabled: 1
+mysql_repo_url: deb http://mariadb.uberglobalmirror.com/repo/{{ mysql_version }}/ubuntu {{ ansible_distribution_release | lower }} main
+mysql_repo_key_id: 1BB943DB
+mysql_repo_key_server: keyserver.ubuntu.com
+mysql_service_name:
+mysql_service_state: started
+mysql_service_enabled: yes
+mysql_packages:
+mysql_pid_path: /var/run/mysqld
+mysql_log_path: /var/log/mysql
+mysql_global_config_file:
+mysql_global_config_file_refresh: yes
+mysql_global_config_template: my.cnf.j2
+mysql_global_config:
+mysql_root_config_file: /root/.my.cnf
+mysql_root_config_template: root.my.cnf.j2
+mysql_root_username: root
+mysql_root_password: ''
+mysql_update_root_password: no
+mysql_resize_innodb_log_files: no
+mysql_users:
+mysql_databases:
