@@ -126,7 +126,7 @@
     exclude: '{{ item.exclude | default(omit) }}'
     list: '{{ item.list | default(omit) }}'
     state: '{{ item.state | default(omit) }}'
-    update_cache: '{{ item.update_cache | default(omit) }}'
+    update_cache: '{{ mysql_repo.changed or item.update_cache | default(omit) }}'
   register: mysql_installed_packages
   with_items: mysql_packages
   when: ansible_os_family == 'RedHat' and mysql_packages
