@@ -84,7 +84,7 @@ mysql_repo_enabled: 1
 Whether the repository is enabled or disabled globally for RedHat/CentOS.
 
 ```
-mysql_repo_url: deb http://mariadb.uberglobalmirror.com/repo/{{ mysql_version }}/ubuntu {{ ansible_distribution_release | lower }} main
+mysql_repo_url: deb http://nyc2.mirrors.digitalocean.com/mariadb/repo/{{ mysql_version }}/ubuntu {{ ansible_distribution_release | lower }} main
 ```
 
 The repository URL for Debian/Ubuntu.

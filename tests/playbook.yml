@@ -8,7 +8,5 @@
 ---
 
 - hosts: all
-  vars:
-    mysql_repo_url: deb  http://nyc2.mirrors.digitalocean.com/mariadb/repo/{{ mysql_version }}/ubuntu {{ ansible_distribution_release | lower }} main
   roles:
     - { role: ../../ }
