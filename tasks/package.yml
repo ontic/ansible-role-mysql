@@ -54,7 +54,7 @@
   file:
     path: '/etc/yum.repos.d/{{ mysql_repo_uid }}.repo'
     state: absent
-  register: mysql_repo
+  register: mysql_repo_removed
   when: ansible_os_family == 'RedHat' and mysql_repo_state | default('present') == 'absent'
   tags:
     - package
@@ -68,7 +68,7 @@
     owner: root
     group: root
     mode: 0644
-  register: mysql_repo
+  register: mysql_repo_added
   when: ansible_os_family == 'RedHat' and mysql_repo_state | default('present') == 'present'
   tags:
     - package
@@ -126,7 +126,7 @@
     exclude: '{{ item.exclude | default(omit) }}'
     list: '{{ item.list | default(omit) }}'
     state: '{{ item.state | default(omit) }}'
-    update_cache: '{{ mysql_repo.changed or item.update_cache | default(omit) }}'
+    update_cache: '{{ mysql_repo_removed.changed or mysql_repo_added.changed or item.update_cache | default(omit) }}'
   register: mysql_installed_packages
   with_items: mysql_packages
   when: ansible_os_family == 'RedHat' and mysql_packages
