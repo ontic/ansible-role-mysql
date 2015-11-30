@@ -130,8 +130,8 @@ If the value remains omitted, the following packages will be installed by defaul
 
 | Debian/Ubuntu          | RedHat/CentOS           |
 | :--------------------- | :---------------------- |
-| mariadb-client         |  MariaDB-client         |
-| mariadb-server         |  MariaDB-server         |
+| mariadb-client         | MariaDB-client          |
+| mariadb-server         | MariaDB-server          |
 
 ```
 mysql_pid_path: /var/run/mysqld
