@@ -20,7 +20,6 @@
     id: '{{ mysql_repo_key_id }}'
     keyserver: '{{ mysql_repo_key_server }}'
     state: '{{ mysql_repo_state }}'
-    update_cache: true
   register: mysql_key
   when: ansible_os_family == 'Debian'
 
@@ -29,6 +28,7 @@
   apt_repository:
     repo: '{{ mysql_repo_url }}'
     state: '{{ mysql_repo_state }}'
+    update_cache: true
   register: mysql_list
   when: ansible_os_family == 'Debian'
 
