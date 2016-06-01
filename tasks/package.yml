@@ -20,6 +20,7 @@
     id: '{{ mysql_repo_key_id }}'
     keyserver: '{{ mysql_repo_key_server }}'
     state: '{{ mysql_repo_state }}'
+    update_cache: true
   register: mysql_key
   when: ansible_os_family == 'Debian'
 
@@ -61,7 +62,6 @@
   apt:
     pkg: python-mysqldb
     state: present
-    allow_unauthenticated: true
   when: ansible_os_family == 'Debian'
 
 - name: MySQL | RedHat | Install MySQL Python package.
