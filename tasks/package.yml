@@ -61,6 +61,7 @@
   apt:
     pkg: python-mysqldb
     state: present
+    allow_unauthenticated: true
   when: ansible_os_family == 'Debian'
 
 - name: MySQL | RedHat | Install MySQL Python package.
