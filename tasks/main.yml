@@ -3,28 +3,74 @@
 # through the world-wide-web at this URL: http://www.ontic.com.au/license.html
 # If you did not receive a copy of the license and are unable to obtain it through
 # the world-wide-web, please send an email to license@ontic.com.au immediately.
-# Copyright (c) 2010-2015 Ontic. (http://www.ontic.com.au). All rights reserved.
+# Copyright (c) 2010-2016 Ontic. (http://www.ontic.com.au). All rights reserved.
 
 ---
 
 - name: MySQL | Include OS-specific variables.
   include_vars: '{{ ansible_os_family }}.yml'
+  tags:
+    - mysql
+    - mysql-package
+    - mysql-configure
+    - mysql-service
+    - package
+    - configure
+    - service
 
 - name: MySQL | Define MySQL service name.
   set_fact:
     mysql_service_name: '{{ mysql_default_service_name }}'
   when: not mysql_service_name
+  tags:
+    - mysql
+    - mysql-package
+    - mysql-configure
+    - mysql-service
+    - package
+    - configure
+    - service
 
 - name: MySQL | Define MySQL packages.
   set_fact:
     mysql_packages: '{{ mysql_default_packages | list }}'
   when: not mysql_packages
+  tags:
+    - mysql
+    - mysql-package
+    - mysql-configure
+    - mysql-service
+    - package
+    - configure
+    - service
 
 - name: MySQL | Define whether MySQL is installed.
   stat:
     path: /etc/init.d/mysql
   register: mysql_installed
+  tags:
+    - mysql
+    - mysql-package
+    - mysql-configure
+    - mysql-service
+    - package
+    - configure
+    - service
 
 - include: package.yml
+  tags:
+    - mysql
+    - mysql-package
+    - package
+
 - include: configure.yml
+  tags:
+    - mysql
+    - mysql-configure
+    - configure
+
 - include: service.yml
+  tags:
+    - mysql
+    - mysql-service
+    - service

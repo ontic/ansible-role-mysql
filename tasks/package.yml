@@ -3,65 +3,50 @@
 # through the world-wide-web at this URL: http://www.ontic.com.au/license.html
 # If you did not receive a copy of the license and are unable to obtain it through
 # the world-wide-web, please send an email to license@ontic.com.au immediately.
-# Copyright (c) 2010-2015 Ontic. (http://www.ontic.com.au). All rights reserved.
+# Copyright (c) 2010-2016 Ontic. (http://www.ontic.com.au). All rights reserved.
 
 ---
 
 - name: MySQL | Debian | Add launchpad PPA.
-  sudo: yes
+  become: yes
   apt_repository:
     repo: '{{ mysql_ppa }}'
     update_cache: yes
   when: ansible_os_family == 'Debian' and mysql_ppa
-  tags:
-    - package
-    - mysql
 
 - name: MySQL | Debian | Update repository key.
-  sudo: yes
+  become: yes
   apt_key:
     id: '{{ mysql_repo_key_id }}'
     keyserver: '{{ mysql_repo_key_server }}'
     state: '{{ mysql_repo_state }}'
   register: mysql_key
   when: ansible_os_family == 'Debian'
-  tags:
-    - package
-    - mysql
 
 - name: MySQL | Debian | Update repository list.
-  sudo: yes
+  become: yes
   apt_repository:
     repo: '{{ mysql_repo_url }}'
     state: '{{ mysql_repo_state }}'
   register: mysql_list
   when: ansible_os_family == 'Debian'
-  tags:
-    - package
-    - mysql
 
 - name: MySQL | Debian | Update APT cache.
-  sudo: yes
+  become: yes
   apt:
     update_cache: yes
   when: ansible_os_family == 'Debian' and (mysql_key.changed or mysql_list.changed)
-  tags:
-    - package
-    - mysql
 
 - name: PHP | RedHat | Remove absent repository.
-  sudo: yes
+  become: yes
   file:
     path: '/etc/yum.repos.d/{{ mysql_repo_uid }}.repo'
     state: absent
   register: mysql_repo_removed
   when: ansible_os_family == 'RedHat' and mysql_repo_state | default('present') == 'absent'
-  tags:
-    - package
-    - nginx
 
 - name: MySQL | RedHat | Add present repository.
-  sudo: yes
+  become: yes
   template:
     src: yum.repo.j2
     dest: '/etc/yum.repos.d/{{ mysql_repo_uid }}.repo'
@@ -70,32 +55,23 @@
     mode: 0644
   register: mysql_repo_added
   when: ansible_os_family == 'RedHat' and mysql_repo_state | default('present') == 'present'
-  tags:
-    - package
-    - mysql
 
 - name: MySQL | Debian | Install MySQL Python package.
-  sudo: yes
+  become: yes
   apt:
     pkg: python-mysqldb
     state: present
   when: ansible_os_family == 'Debian'
-  tags:
-    - package
-    - mysql
 
 - name: MySQL | RedHat | Install MySQL Python package.
-  sudo: yes
+  become: yes
   yum:
     name: MySQL-python
     state: present
   when: ansible_os_family == 'RedHat'
-  tags:
-    - package
-    - mysql
 
 - name: MySQL | Debian | Install MySQL packages.
-  sudo: yes
+  become: yes
   apt:
     name: '{{ item.name if item.version is not defined else item.name + "=" + item.version }}'
     cache_valid_time: '{{ item.cache_valid_time | default(omit) }}'
@@ -109,14 +85,11 @@
     update_cache: '{{ item.update_cache | default(omit) }}'
     upgrade: '{{ item.upgrade | default(omit) }}'
   register: mysql_installed_packages
-  with_items: mysql_packages
+  with_items: '{{ mysql_packages }}'
   when: ansible_os_family == 'Debian' and mysql_packages
-  tags:
-    - package
-    - mysql
 
 - name: MySQL | RedHat | Install MySQL packages.
-  sudo: yes
+  become: yes
   yum:
     name: '{{ item.name if item.version is not defined else item.name + "-" + item.version }}'
     conf_file: '{{ item.conf_file | default(omit) }}'
@@ -128,8 +101,5 @@
     state: '{{ item.state | default(omit) }}'
     update_cache: '{{ mysql_repo_removed.changed or mysql_repo_added.changed or item.update_cache | default(omit) }}'
   register: mysql_installed_packages
-  with_items: mysql_packages
+  with_items: '{{ mysql_packages }}'
   when: ansible_os_family == 'RedHat' and mysql_packages
-  tags:
-    - package
-    - mysql

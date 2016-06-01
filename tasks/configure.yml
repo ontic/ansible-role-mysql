@@ -3,30 +3,24 @@
 # through the world-wide-web at this URL: http://www.ontic.com.au/license.html
 # If you did not receive a copy of the license and are unable to obtain it through
 # the world-wide-web, please send an email to license@ontic.com.au immediately.
-# Copyright (c) 2010-2015 Ontic. (http://www.ontic.com.au). All rights reserved.
+# Copyright (c) 2010-2016 Ontic. (http://www.ontic.com.au). All rights reserved.
 
 ---
 
 - name: MySQL | Stop MySQL when resizing InnoDB log files.
-  sudo: yes
+  become: yes
   service:
     name: '{{ mysql_service_name }}'
     state: stopped
   when: mysql_installed.stat.exists == false or mysql_resize_innodb_log_files
-  tags:
-    - configure
-    - mysql
 
 - name: MySQL | Delete InnoDB log files when resizing.
-  sudo: yes
+  become: yes
   command: rm -f /var/lib/mysql/ib_logfile[01]
   when: mysql_installed.stat.exists == false or mysql_resize_innodb_log_files
-  tags:
-    - configure
-    - mysql
 
 - name: MySQL | Replace the global config file.
-  sudo: yes
+  become: yes
   template:
     src: '{{ mysql_global_config_template }}'
     dest: '{{ mysql_global_config_file }}'
@@ -35,12 +29,9 @@
     group: root
     mode: 0644
   notify: restart mysql
-  tags:
-    - configure
-    - mysql
 
 - name: MySQL | Configure properties in global config file.
-  sudo: yes
+  become: yes
   ini_file:
     dest: '{{ mysql_global_config_file }}'
     section: '{{ item.section }}'
@@ -52,14 +43,11 @@
     group: root
     mode: 0644
   notify: restart mysql
-  with_items: mysql_global_config
+  with_items: '{{ mysql_global_config }}'
   when: mysql_global_config
-  tags:
-    - configure
-    - mysql
 
 - name: MySQL | Set ownership of directories.
-  sudo: yes
+  become: yes
   file:
     path: '{{ item }}'
     state: directory
@@ -69,112 +57,100 @@
   with_items:
     - '{{ mysql_pid_path }}'
     - '{{ mysql_log_path }}'
-  tags:
-    - configure
-    - mysql
 
 - name: MySQL | Ensure MySQL is started.
-  sudo: yes
+  become: yes
   service:
     name: '{{ mysql_service_name }}'
     state: started
-  tags:
-    - configure
-    - mysql
 
 - name: MySQL | Retrieve the root user hosts.
-  sudo: yes
+  become: yes
   command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = "root" ORDER BY (Host="localhost") ASC'
   register: mysql_root_hosts
   changed_when: false
-  tags:
-    - configure
-    - mysql
 
 - name: MySQL | Update the root user password.
-  sudo: yes
+  become: yes
   command: mysql -u root -NBe 'SET PASSWORD FOR "{{ mysql_root_username }}"@"{{ item }}" = PASSWORD("{{ mysql_root_password }}");'
-  with_items: mysql_root_hosts.stdout_lines
+  with_items: '{{ mysql_root_hosts.stdout_lines }}'
   when: mysql_update_root_password or (mysql_installed_packages is defined and mysql_installed_packages.changed)
-  tags:
-    - configure
-    - mysql
 
 - name: MySQL | Update the root config file with credentials.
-  sudo: yes
+  become: yes
   template:
     src: '{{ mysql_root_config_template }}'
     dest: '{{ mysql_root_config_file }}'
     owner: root
     group: root
     mode: 0600
-  tags:
-    - configure
-    - mysql
 
 - name: MySQL | Retrieve the anonymous user hosts.
-  sudo: yes
+  become: yes
   command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = ""'
   register: mysql_anonymous_hosts
   changed_when: false
-  tags:
-    - configure
-    - mysql
 
 - name: MySQL | Remove anonymous users.
-  sudo: yes
+  become: yes
   mysql_user:
     name: ''
     host: '{{ item }}'
     state: absent
-  with_items: mysql_anonymous_hosts.stdout_lines
-  tags:
-    - configure
-    - mysql
+  with_items: '{{ mysql_anonymous_hosts.stdout_lines }}'
 
 - name: MySQL | Remove the test database.
-  sudo: yes
+  become: yes
   mysql_db:
     name: test
     state: absent
-  tags:
-    - configure
-    - mysql
 
 - name: MySQL | Configure users.
-  sudo: yes
+  become: yes
   mysql_user:
-    name: '{{ item.name }}'
-    password: '{{ item.password }}'
+    append_privs: '{{ item.append_privs | default(omit) }}'
+    check_implicit_admin: '{{ item.check_implicit_admin | default(omit) }}'
+    config_file: '{{ item.config_file | default(omit) }}'
+    connect_timeout: '{{ item.connect_timeout | default(omit) }}'
+    encrypted: '{{ item.encrypted | default(omit) }}'
     host: '{{ item.host | default(omit) }}'
+    host_all: '{{ item.host_all | default(omit) }}'
     login_host: '{{ item.login_host | default(omit) }}'
     login_password: '{{ item.login_password | default(omit) }}'
     login_port: '{{ item.login_port | default(omit) }}'
     login_unix_socket: '{{ item.login_unix_socket | default(omit) }}'
     login_user: '{{ item.login_user | default(omit) }}'
+    name: '{{ item.name }}'
+    password: '{{ item.password }}'
     priv: '{{ item.priv | default("*.*:USAGE") }}'
+    sql_log_bin: '{{ item.sql_log_bin | default(omit) }}'
+    ssl_ca: '{{ item.ssl_ca | default(omit) }}'
+    ssl_cert: '{{ item.ssl_cert | default(omit) }}'
+    ssl_key: '{{ item.ssl_key | default(omit) }}'
     state: '{{ item.state | default(omit) }}'
-  with_items: mysql_users
+    update_password: '{{ item.update_password | default(omit) }}'
+  with_items: '{{ mysql_users }}'
   when: mysql_users
-  tags:
-    - configure
-    - mysql
 
 - name: MySQL | Configure databases.
-  sudo: yes
+  become: yes
   mysql_db:
-    name: '{{ item.name }}'
     collation: '{{ item.collation | default("utf8_general_ci") }}'
+    config_file: '{{ item.config_file | default(omit) }}'
+    connect_timeout: '{{ item.connect_timeout | default(omit) }}'
     encoding: '{{ item.encoding | default("utf8") }}'
     login_host: '{{ item.login_host | default(omit) }}'
     login_password: '{{ item.login_password | default(omit) }}'
     login_port: '{{ item.login_port | default(omit) }}'
     login_unix_socket: '{{ item.login_unix_socket | default(omit) }}'
     login_user: '{{ item.login_user | default(omit) }}'
+    name: '{{ item.name }}'
+    quick: '{{ item.quick | default(omit) }}'
+    single_transaction: '{{ item.single_transaction | default(omit) }}'
+    ssl_ca: '{{ item.ssl_ca | default(omit) }}'
+    ssl_cert: '{{ item.ssl_cert | default(omit) }}'
+    ssl_key: '{{ item.ssl_key | default(omit) }}'
     state: '{{ item.state | default(omit) }}'
     target: '{{ item.target | default(omit) }}'
-  with_items: mysql_databases
+  with_items: '{{ mysql_databases }}'
   when: mysql_databases
-  tags:
-    - configure
-    - mysql
