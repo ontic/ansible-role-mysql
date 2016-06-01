@@ -28,7 +28,6 @@
   apt_repository:
     repo: '{{ mysql_repo_url }}'
     state: '{{ mysql_repo_state }}'
-    update_cache: true
   register: mysql_list
   when: ansible_os_family == 'Debian'
 
