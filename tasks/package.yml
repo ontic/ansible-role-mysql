@@ -61,6 +61,7 @@
   apt:
     pkg: python-mysqldb
     state: present
+    allow_unauthenticated: yes
   when: ansible_os_family == 'Debian'
 
 - name: MySQL | RedHat | Install MySQL Python package.
@@ -84,6 +85,7 @@
     state: '{{ item.state | default(omit) }}'
     update_cache: '{{ item.update_cache | default(omit) }}'
     upgrade: '{{ item.upgrade | default(omit) }}'
+    allow_unauthenticated: yes
   register: mysql_installed_packages
   with_items: '{{ mysql_packages }}'
   when: ansible_os_family == 'Debian' and mysql_packages
