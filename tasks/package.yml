@@ -14,6 +14,13 @@
     update_cache: yes
   when: ansible_os_family == 'Debian' and mysql_ppa
 
+- name: MySQL | Debian | Install MySQL Python package.
+  become: yes
+  apt:
+    pkg: python-mysqldb
+    state: present
+  when: ansible_os_family == 'Debian'
+
 - name: MySQL | Debian | Update repository key.
   become: yes
   apt_key:
@@ -55,13 +62,6 @@
     mode: 0644
   register: mysql_repo_added
   when: ansible_os_family == 'RedHat' and mysql_repo_state | default('present') == 'present'
-
-- name: MySQL | Debian | Install MySQL Python package.
-  become: yes
-  apt:
-    pkg: python-mysqldb
-    state: present
-  when: ansible_os_family == 'Debian'
 
 - name: MySQL | RedHat | Install MySQL Python package.
   become: yes
