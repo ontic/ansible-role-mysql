@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 RUN apt-get update
-RUN apt-get install software-properties-common
+RUN apt-get install -y --no-install-recommends software-properties-common
 RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db
 RUN add-apt-repository 'deb http://mariadb.mirror.digitalpacific.com.au/repo/10.1/ubuntu xenial main'
 RUN apt-get update
