@@ -35,7 +35,7 @@
   become: yes
   apt:
     update_cache: yes
-  when: ansible_os_family == 'Debian' and mysql_installed.stat.exists == false
+  when: ansible_os_family == 'Debian' and (mysql_key.changed or mysql_list.changed)
 
 - name: PHP | RedHat | Remove absent repository.
   become: yes
