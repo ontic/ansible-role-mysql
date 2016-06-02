@@ -71,17 +71,16 @@
   command: mysql -NBe 'DELETE FROM mysql.user WHERE User="root" AND Host NOT IN ("localhost", "127.0.0.1", "::1")'
   changed_when: false
 
-- name: MySQL | Retrieve the root user hosts.
-  become: yes
-  command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = "root" ORDER BY (Host="localhost") ASC'
-  register: mysql_root_hosts
-  changed_when: false
-
 - name: MySQL | Update the root user password.
   become: yes
-  command: mysql -u root -NBe 'SET PASSWORD FOR "{{ mysql_root_username }}"@"{{ item }}" = PASSWORD("{{ mysql_root_password }}");'
+  mysql_user:
+    name: root
+    host_all: yes
+    password: '{{ mysql_root_password }}'
+    login_user: '{{ mysql_root_username }}'
+    login_password: '{{ mysql_old_root_password }}'
   with_items: '{{ mysql_root_hosts.stdout_lines }}'
-  when: mysql_update_root_password or (mysql_debian_installed_packages is defined and mysql_debian_installed_packages.changed) or (mysql_redhat_installed_packages is defined and mysql_redhat_installed_packages.changed)
+  when: mysql_old_root_password | default(None) != None
 
 - name: MySQL | Update the root config file with credentials.
   become: yes
@@ -92,19 +91,14 @@
     group: root
     mode: 0600
 
-- name: MySQL | Retrieve the anonymous user hosts.
-  become: yes
-  command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = ""'
-  register: mysql_anonymous_hosts
-  changed_when: false
-
 - name: MySQL | Remove anonymous users.
   become: yes
   mysql_user:
     name: ''
-    host: '{{ item }}'
+    host_all: yes
+    login_user: '{{ mysql_root_username }}'
+    login_password: '{{ mysql_root_password }}'
     state: absent
-  with_items: '{{ mysql_anonymous_hosts.stdout_lines }}'
 
 - name: MySQL | Remove the test database.
   become: yes
