@@ -29,6 +29,7 @@
     group: root
     mode: 0644
   notify: restart mysql
+  when: mysql_global_config_template
 
 - name: MySQL | Configure properties in global config file.
   become: yes
