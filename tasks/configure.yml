@@ -17,8 +17,11 @@
 - name: MySQL | Delete InnoDB log files when resizing.
   become: yes
   file:
-    path: /var/lib/mysql/ib_logfile[01]
+    path: '{{ item }}'
     state: absent
+  with_items:
+    - '/var/lib/mysql/ib_logfile0'
+    - '/var/lib/mysql/ib_logfile1'
   when: mysql_installed.stat.exists == false or mysql_resize_innodb_log_files
 
 - name: MySQL | Replace the global config file.
@@ -73,15 +76,28 @@
   command: mysql -NBe 'DELETE FROM mysql.user WHERE User="root" AND Host NOT IN ("localhost", "127.0.0.1", "::1")'
   changed_when: false
 
+- name: MySQL | Retrieve the root user hosts.
+  become: yes
+  command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = "root" ORDER BY (Host="localhost") ASC'
+  register: mysql_root_hosts
+  changed_when: false
+
+- name: MySQL | Retrieve the anonymous user hosts.
+  become: yes
+  command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = ""'
+  register: mysql_anonymous_hosts
+  changed_when: false
+
 - name: MySQL | Update the root user password.
   become: yes
   mysql_user:
-    name: root
-    host_all: yes
+    name: '{{ mysql_root_username }}'
+    host: '{{ item }}'
     password: '{{ mysql_root_password }}'
     login_user: '{{ mysql_root_username }}'
     login_password: '{{ mysql_old_root_password }}'
-  when: mysql_old_root_password | default(None) != None
+  with_items: '{{ mysql_root_hosts.stdout_lines }}'
+  when: mysql_update_root_password or (mysql_debian_installed_packages is defined and mysql_debian_installed_packages.changed) or (mysql_redhat_installed_packages is defined and mysql_redhat_installed_packages.changed)
 
 - name: MySQL | Update the root config file with credentials.
   become: yes
@@ -96,10 +112,9 @@
   become: yes
   mysql_user:
     name: ''
-    host_all: yes
-    login_user: '{{ mysql_root_username }}'
-    login_password: '{{ mysql_root_password }}'
+    host: '{{ item }}'
     state: absent
+  with_items: '{{ mysql_anonymous_hosts.stdout_lines }}'
 
 - name: MySQL | Remove the test database.
   become: yes
