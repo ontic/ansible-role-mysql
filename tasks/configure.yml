@@ -16,7 +16,9 @@
 
 - name: MySQL | Delete InnoDB log files when resizing.
   become: yes
-  command: rm -f /var/lib/mysql/ib_logfile[01]
+  file:
+    path: /var/lib/mysql/ib_logfile[01]
+    state: absent
   when: mysql_installed.stat.exists == false or mysql_resize_innodb_log_files
 
 - name: MySQL | Replace the global config file.
@@ -79,7 +81,6 @@
     password: '{{ mysql_root_password }}'
     login_user: '{{ mysql_root_username }}'
     login_password: '{{ mysql_old_root_password }}'
-  with_items: '{{ mysql_root_hosts.stdout_lines }}'
   when: mysql_old_root_password | default(None) != None
 
 - name: MySQL | Update the root config file with credentials.
