@@ -46,17 +46,17 @@
   with_items: '{{ mysql_global_config }}'
   when: mysql_global_config
 
-- name: MySQL | Set ownership of directories.
-  become: yes
-  file:
-    path: '{{ item }}'
-    state: directory
-    owner: mysql
-    group: mysql
-    mode: 0755
-  with_items:
-    - '{{ mysql_pid_path }}'
-    - '{{ mysql_log_path }}'
+#- name: MySQL | Set ownership of directories.
+#  become: yes
+#  file:
+#    path: '{{ item }}'
+#    state: directory
+#    owner: mysql
+#    group: mysql
+#    mode: 0755
+#  with_items:
+#    - '{{ mysql_pid_path }}'
+#    - '{{ mysql_log_path }}'
 
 - name: MySQL | Ensure MySQL is started.
   become: yes
