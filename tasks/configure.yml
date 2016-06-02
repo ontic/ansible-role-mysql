@@ -79,7 +79,7 @@
   become: yes
   command: mysql -u root -NBe 'SET PASSWORD FOR "{{ mysql_root_username }}"@"{{ item }}" = PASSWORD("{{ mysql_root_password }}");'
   with_items: '{{ mysql_root_hosts.stdout_lines }}'
-  when: not mysql_installed or mysql_update_root_password
+  when: mysql_update_root_password or (mysql_debian_installed_packages is defined and mysql_debian_installed_packages.changed) or (mysql_redhat_installed_packages is defined and mysql_redhat_installed_packages.changed)
 
 - name: MySQL | Update the root config file with credentials.
   become: yes
