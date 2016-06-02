@@ -46,23 +46,28 @@
   with_items: '{{ mysql_global_config }}'
   when: mysql_global_config
 
-#- name: MySQL | Set ownership of directories.
-#  become: yes
-#  file:
-#    path: '{{ item }}'
-#    state: directory
-#    owner: mysql
-#    group: mysql
-#    mode: 0755
-#  with_items:
-#    - '{{ mysql_pid_path }}'
-#    - '{{ mysql_log_path }}'
+- name: MySQL | Set ownership of directories.
+  become: yes
+  file:
+    path: '{{ item }}'
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: 0755
+  with_items:
+    - '{{ mysql_pid_path }}'
+    - '{{ mysql_log_path }}'
+  when: ansible_os_family == 'RedHat'
 
 - name: MySQL | Ensure MySQL is started.
   become: yes
   service:
     name: '{{ mysql_service_name }}'
     state: started
+
+- name: MySQL | Prevent root login remotely.
+  command: mysql -NBe 'DELETE FROM mysql.user WHERE User="root" AND Host NOT IN ("localhost", "127.0.0.1", "::1")'
+  changed_when: false
 
 - name: MySQL | Retrieve the root user hosts.
   become: yes
@@ -74,7 +79,7 @@
   become: yes
   command: mysql -u root -NBe 'SET PASSWORD FOR "{{ mysql_root_username }}"@"{{ item }}" = PASSWORD("{{ mysql_root_password }}");'
   with_items: '{{ mysql_root_hosts.stdout_lines }}'
-  when: mysql_update_root_password or (mysql_installed_packages is defined and mysql_installed_packages.changed)
+  when: not mysql_installed or mysql_update_root_password
 
 - name: MySQL | Update the root config file with credentials.
   become: yes
