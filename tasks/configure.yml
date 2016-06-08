@@ -87,6 +87,10 @@
   register: 'mysql_anonymous_hosts'
   changed_when: false
 
+- debug: var=mysql_update_root_password
+- debug: var=mysql_debian_installed_packages
+- debug: var=mysql_redhat_installed_packages
+
 - name: 'MySQL | Update the root user password.'
   become: yes
   mysql_user:
