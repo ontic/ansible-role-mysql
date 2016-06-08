@@ -7,71 +7,71 @@
 
 ---
 
-- name: MySQL | Debian | Add launchpad PPA.
+- name: 'MySQL | Debian | Add launchpad PPA.'
   become: yes
   apt_repository:
     repo: '{{ mysql_ppa }}'
     update_cache: yes
-  when: ansible_os_family == 'Debian' and mysql_ppa
+  when: '{{ ansible_os_family == "Debian" and mysql_ppa | default(None) != None }}'
 
-- name: MySQL | Debian | Update repository key.
+- name: 'MySQL | Debian | Update repository key.'
   become: yes
   apt_key:
     id: '{{ mysql_repo_key_id }}'
     keyserver: '{{ mysql_repo_key_server }}'
     state: '{{ mysql_repo_state }}'
-  register: mysql_key
-  when: ansible_os_family == 'Debian'
+  register: 'mysql_key'
+  when: '{{ ansible_os_family == "Debian" }}'
 
-- name: MySQL | Debian | Update repository list.
+- name: 'MySQL | Debian | Update repository list.'
   become: yes
   apt_repository:
     repo: '{{ mysql_repo_url }}'
     state: '{{ mysql_repo_state }}'
-  register: mysql_list
-  when: ansible_os_family == 'Debian'
+  register: 'mysql_list'
+  when: '{{ ansible_os_family == "Debian" }}'
 
-- name: MySQL | Debian | Update APT cache.
+- name: 'MySQL | Debian | Update APT cache.'
   become: yes
   apt:
     update_cache: yes
-  when: ansible_os_family == 'Debian' and (mysql_key.changed or mysql_list.changed)
+  when: '{{ ansible_os_family == "Debian" and (mysql_key.changed or mysql_list.changed) }}'
 
-- name: PHP | RedHat | Remove absent repository.
+- name: 'PHP | RedHat | Remove absent repository.'
   become: yes
   file:
     path: '/etc/yum.repos.d/{{ mysql_repo_uid }}.repo'
-    state: absent
-  register: mysql_repo_removed
-  when: ansible_os_family == 'RedHat' and mysql_repo_state | default('present') == 'absent'
+    state: 'absent'
+  register: 'mysql_repo_removed'
+  when: '{{ ansible_os_family == "RedHat" and mysql_repo_state | default("present") == "absent" }}'
 
-- name: MySQL | RedHat | Add present repository.
+- name: 'MySQL | RedHat | Add present repository.'
   become: yes
   template:
-    src: yum.repo.j2
+    src: 'yum.repo.j2'
     dest: '/etc/yum.repos.d/{{ mysql_repo_uid }}.repo'
-    owner: root
-    group: root
-    mode: 0644
-  register: mysql_repo_added
-  when: ansible_os_family == 'RedHat' and mysql_repo_state | default('present') == 'present'
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  register: 'mysql_repo_added'
+  when: '{{ ansible_os_family == "RedHat" and mysql_repo_state | default("present") == "present" }}'
 
-- name: MySQL | Debian | Install MySQL Python package.
+- name: 'MySQL | Debian | Install MySQL Python package.'
   become: yes
   apt:
-    pkg: python-mysqldb
-    state: present
+    pkg: 'python-mysqldb'
+    state: 'present'
     allow_unauthenticated: yes
-  when: ansible_os_family == 'Debian'
+  when: '{{ ansible_os_family == "Debian" }}'
 
-- name: MySQL | RedHat | Install MySQL Python package.
+- name: 'MySQL | RedHat | Install MySQL Python package.'
   become: yes
   yum:
-    name: MySQL-python
-    state: present
-  when: ansible_os_family == 'RedHat'
+    name: 'MySQL-python'
+    state: 'present'
+  when: '{{ ansible_os_family == "RedHat" }}'
 
-- name: MySQL | Debian | Install MySQL packages.
+- name: 'MySQL | Debian | Install MySQL packages.'
   become: yes
   apt:
     name: '{{ item.name if item.version is not defined else item.name + "=" + item.version }}'
@@ -86,11 +86,11 @@
     update_cache: '{{ item.update_cache | default(omit) }}'
     upgrade: '{{ item.upgrade | default(omit) }}'
     allow_unauthenticated: yes
-  register: mysql_debian_installed_packages
+  register: 'mysql_debian_installed_packages'
   with_items: '{{ mysql_packages }}'
-  when: ansible_os_family == 'Debian' and mysql_packages
+  when: '{{ ansible_os_family == "Debian" }}'
 
-- name: MySQL | RedHat | Install MySQL packages.
+- name: 'MySQL | RedHat | Install MySQL packages.'
   become: yes
   yum:
     name: '{{ item.name if item.version is not defined else item.name + "-" + item.version }}'
@@ -102,6 +102,6 @@
     list: '{{ item.list | default(omit) }}'
     state: '{{ item.state | default(omit) }}'
     update_cache: '{{ mysql_repo_removed.changed or mysql_repo_added.changed or item.update_cache | default(omit) }}'
-  register: mysql_redhat_installed_packages
+  register: 'mysql_redhat_installed_packages'
   with_items: '{{ mysql_packages }}'
-  when: ansible_os_family == 'RedHat' and mysql_packages
+  when: '{{ ansible_os_family == "RedHat" }}'

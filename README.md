@@ -2,7 +2,7 @@
 
 | Branch             | Build               | Galaxy              | Release              |
 | :----------------- | :------------------ | :------------------ | :------------------- |
-| **master**         | [![Build](https://img.shields.io/travis/ontic/ansible-role-mysql/master.svg)](https://travis-ci.org/ontic/ansible-role-mysql) | [![Galaxy](https://img.shields.io/badge/galaxy-ontic.mysql-blue.svg)](https://galaxy.ansible.com/list#/roles/6274) | [![Release](https://img.shields.io/github/release/ontic/ansible-role-mysql.svg)](https://github.com/ontic/ansible-role-mysql/releases) |
+| **master**         | [![Build](https://img.shields.io/travis/ontic/ansible-role-mysql/master.svg)](https://travis-ci.org/ontic/ansible-role-mysql) | [![Galaxy](https://img.shields.io/badge/galaxy-ontic.mysql-blue.svg)](https://galaxy.ansible.com/ontic/mysql/) | [![Release](https://img.shields.io/github/release/ontic/ansible-role-mysql.svg)](https://github.com/ontic/ansible-role-mysql/releases) |
 
 ## Introduction
 

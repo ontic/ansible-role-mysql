@@ -7,36 +7,36 @@
 
 ---
 
-- name: MySQL | Stop MySQL when resizing InnoDB log files.
+- name: 'MySQL | Stop MySQL when resizing InnoDB log files.'
   become: yes
   service:
     name: '{{ mysql_service_name }}'
-    state: stopped
-  when: mysql_installed.stat.exists == false or mysql_resize_innodb_log_files
+    state: 'stopped'
+  when: '{{ not mysql_installed.stat.exists or mysql_resize_innodb_log_files }}'
 
-- name: MySQL | Delete InnoDB log files when resizing.
+- name: 'MySQL | Delete InnoDB log files when resizing.'
   become: yes
   file:
     path: '{{ item }}'
-    state: absent
+    state: 'absent'
   with_items:
     - '/var/lib/mysql/ib_logfile0'
     - '/var/lib/mysql/ib_logfile1'
-  when: mysql_installed.stat.exists == false or mysql_resize_innodb_log_files
+  when: '{{ not mysql_installed.stat.exists or mysql_resize_innodb_log_files }}'
 
-- name: MySQL | Replace the global config file.
+- name: 'MySQL | Replace the global config file.'
   become: yes
   template:
     src: '{{ mysql_global_config_template }}'
     dest: '{{ mysql_global_config_file }}'
     force: '{{ "yes" if mysql_installed.stat.exists == false or mysql_global_config_file_refresh else "no" }}'
-    owner: root
-    group: root
-    mode: 0644
-  notify: restart mysql
-  when: mysql_global_config_template | default(None) != None
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  notify: 'restart mysql'
+  when: '{{ mysql_global_config_template | default(None) != None }}'
 
-- name: MySQL | Configure properties in global config file.
+- name: 'MySQL | Configure properties in global config file.'
   become: yes
   ini_file:
     dest: '{{ mysql_global_config_file }}'
@@ -44,51 +44,50 @@
     option: '{{ item.option | default(omit) }}'
     value: '{{ item.value | default(omit) }}'
     state: '{{ item.state | default(omit) }}'
-    backup: yes
-    owner: root
-    group: root
-    mode: 0644
-  notify: restart mysql
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  notify: 'restart mysql'
   with_items: '{{ mysql_global_config }}'
-  when: mysql_global_config
+  when: '{{ mysql_global_config | default(None) != None }}'
 
-- name: MySQL | Set ownership of directories.
+- name: 'MySQL | Set ownership of directories.'
   become: yes
   file:
     path: '{{ item }}'
-    state: directory
-    owner: mysql
-    group: mysql
-    mode: 0755
+    state: 'directory'
+    owner: 'mysql'
+    group: 'mysql'
+    mode: '0755'
   with_items:
     - '{{ mysql_pid_path }}'
     - '{{ mysql_log_path }}'
-  when: ansible_os_family == 'RedHat'
+  when: '{{ ansible_os_family == "RedHat" }}'
 
-- name: MySQL | Ensure MySQL is started.
+- name: 'MySQL | Ensure MySQL is started.'
   become: yes
   service:
     name: '{{ mysql_service_name }}'
-    state: started
+    state: 'started'
 
-- name: MySQL | Prevent root login remotely.
+- name: 'MySQL | Prevent root login remotely.'
   become: yes
-  command: mysql -NBe 'DELETE FROM mysql.user WHERE User="root" AND Host NOT IN ("localhost", "127.0.0.1", "::1")'
+  command: 'mysql -NBe ''DELETE FROM mysql.user WHERE User="root" AND Host NOT IN ("localhost", "127.0.0.1", "::1")'''
   changed_when: false
 
-- name: MySQL | Retrieve the root user hosts.
+- name: 'MySQL | Retrieve the root user hosts.'
   become: yes
-  command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = "root" ORDER BY (Host="localhost") ASC'
-  register: mysql_root_hosts
+  command: 'mysql -NBe ''SELECT Host FROM mysql.user WHERE User = "root" ORDER BY (Host="localhost") ASC'''
+  register: 'mysql_root_hosts'
   changed_when: false
 
-- name: MySQL | Retrieve the anonymous user hosts.
+- name: 'MySQL | Retrieve the anonymous user hosts.'
   become: yes
-  command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = ""'
-  register: mysql_anonymous_hosts
+  command: 'mysql -NBe ''SELECT Host FROM mysql.user WHERE User = ""'''
+  register: 'mysql_anonymous_hosts'
   changed_when: false
 
-- name: MySQL | Update the root user password.
+- name: 'MySQL | Update the root user password.'
   become: yes
   mysql_user:
     name: '{{ mysql_root_username }}'
@@ -97,32 +96,32 @@
     login_user: '{{ mysql_root_username }}'
     login_password: '{{ mysql_old_root_password }}'
   with_items: '{{ mysql_root_hosts.stdout_lines }}'
-  when: mysql_update_root_password or (mysql_debian_installed_packages is defined and mysql_debian_installed_packages.changed) or (mysql_redhat_installed_packages is defined and mysql_redhat_installed_packages.changed)
+  when: '{{ mysql_update_root_password or (mysql_debian_installed_packages is defined and mysql_debian_installed_packages.changed) or (mysql_redhat_installed_packages is defined and mysql_redhat_installed_packages.changed) }}'
 
-- name: MySQL | Update the root config file with credentials.
+- name: 'MySQL | Update the root config file with credentials.'
   become: yes
   template:
     src: '{{ mysql_root_config_template }}'
     dest: '{{ mysql_root_config_file }}'
-    owner: root
-    group: root
-    mode: 0600
+    owner: 'root'
+    group: 'root'
+    mode: '0600'
 
-- name: MySQL | Remove anonymous users.
+- name: 'MySQL | Remove anonymous users.'
   become: yes
   mysql_user:
     name: ''
     host: '{{ item }}'
-    state: absent
+    state: 'absent'
   with_items: '{{ mysql_anonymous_hosts.stdout_lines }}'
 
-- name: MySQL | Remove the test database.
+- name: 'MySQL | Remove the test database.'
   become: yes
   mysql_db:
-    name: test
-    state: absent
+    name: 'test'
+    state: 'absent'
 
-- name: MySQL | Configure users.
+- name: 'MySQL | Configure users.'
   become: yes
   mysql_user:
     append_privs: '{{ item.append_privs | default(omit) }}'
@@ -147,9 +146,9 @@
     state: '{{ item.state | default(omit) }}'
     update_password: '{{ item.update_password | default(omit) }}'
   with_items: '{{ mysql_users }}'
-  when: mysql_users
+  when: '{{ mysql_users | default(None) != None }}'
 
-- name: MySQL | Configure databases.
+- name: 'MySQL | Configure databases.'
   become: yes
   mysql_db:
     collation: '{{ item.collation | default("utf8_general_ci") }}'
@@ -170,4 +169,4 @@
     state: '{{ item.state | default(omit) }}'
     target: '{{ item.target | default(omit) }}'
   with_items: '{{ mysql_databases }}'
-  when: mysql_databases
+  when: '{{ mysql_databases | default(None) != None }}'

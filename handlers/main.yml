@@ -7,20 +7,20 @@
 
 ---
 
-- name: start mysql
+- name: 'start mysql'
   become: yes
   service:
     name: '{{ mysql_service_name }}'
-    state: started
+    state: 'started'
 
-- name: stop mysql
+- name: 'stop mysql'
   become: yes
   service:
     name: '{{ mysql_service_name }}'
-    state: stopped
+    state: 'stopped'
 
-- name: restart mysql
+- name: 'restart mysql'
   become: yes
   service:
     name: '{{ mysql_service_name }}'
-    state: restarted
+    state: 'restarted'

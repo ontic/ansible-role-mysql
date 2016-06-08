@@ -3,26 +3,26 @@
 ## Example
 
 ```
-mysql_version: 10.1
-mysql_root_password: root-password
+mysql_version: '10.1'
+mysql_root_password: 'root-password'
 mysql_global_config:
-  - { section: client, option: port, value: 3306 }
-  - { section: mysqld, option: max_connections, value: 150 }
-  - { section: mysqld, option: key_buffer_size, value: 256M }
-  - { section: mysqld, option: max_allowed_packet, value: 64M }
+  - { section: 'client', option: 'port', value: '3306' }
+  - { section: 'mysqld', option: 'max_connections', value: '150' }
+  - { section: 'mysqld', option: 'key_buffer_size', value: '256M' }
+  - { section: 'mysqld', option: 'max_allowed_packet', value: '64M' }
 mysql_users:
-  - name: my-domain
-    host: "%"
-    password: database-password
-    priv: "my-database.*:ALL"
-  - name: old-client
-    state: absent
+  - name: 'deployer'
+    host: '%'
+    password: 'strong-password'
+    priv: 'my-database.*:ALL'
+  - name: 'oldclient'
+    state: 'absent'
 mysql_databases:
-  - name: my-database
-    encoding: utf8
-    collation: utf8_general_ci
-  - name: old-database
-    state: absent
+  - name: 'application_database'
+    encoding: 'utf8'
+    collation: 'utf8_general_ci'
+  - name: 'old_database'
+    state: 'absent'
 ```
 
 ## Role Variables
@@ -36,67 +36,67 @@ mysql_ppa:
 The launchpad PPA to add to APT. Which would allow a non-official package of MySQL to be installed.
 
 ```
-mysql_version: 10.1
+mysql_version: '10.1'
 ```
 
 The MySQL package version you want to install.
 
 ```
-mysql_repo_state: present
+mysql_repo_state: 'present'
 ```
 
 The desired MySQL repository state, valid values are `present`, or `absent`.
 
 ```
-mysql_repo_uid: mariadb
+mysql_repo_uid: 'mariadb'
 ```
 
 The unique repository identifier for RedHat/CentOS .
 
 ```
-mysql_repo_name: MariaDB
+mysql_repo_name: 'MariaDB'
 ```
 
 The human readable repository name for RedHat/CentOS.
 
 ```
-mysql_repo_baseurl: http://yum.mariadb.org/{{ mysql_version }}/centos/{{ ansible_distribution_major_version }}/$basearch/
+mysql_repo_baseurl: 'http://yum.mariadb.org/{{ mysql_version }}/centos/{{ ansible_distribution_major_version }}/$basearch/'
 ```
 
 The repository URL for RedHat/CentOS.
 
 ```
-mysql_repo_gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+mysql_repo_gpgkey: 'https://yum.mariadb.org/RPM-GPG-KEY-MariaDB'
 ```
 
 The GPG key URL for RedHat/CentOS.
 
 ```
-mysql_repo_gpgcheck: 1
+mysql_repo_gpgcheck: '1'
 ```
 
 Whether GPG signature checking is enabled or disabled for RedHat/CentOS.
 
 ```
-mysql_repo_enabled: 1
+mysql_repo_enabled: '1'
 ```
 
 Whether the repository is enabled or disabled globally for RedHat/CentOS.
 
 ```
-mysql_repo_url: deb http://nyc2.mirrors.digitalocean.com/mariadb/repo/{{ mysql_version }}/ubuntu {{ ansible_distribution_release | lower }} main
+mysql_repo_url: 'deb http://nyc2.mirrors.digitalocean.com/mariadb/repo/{{ mysql_version }}/ubuntu {{ ansible_distribution_release | lower }} main'
 ```
 
 The repository URL for Debian/Ubuntu.
 
 ```
-mysql_repo_key_id: 1BB943DB
+mysql_repo_key_id: '1BB943DB'
 ```
 
 The repository key identifier for Debian/Ubuntu.
 
 ```
-mysql_repo_key_server: keyserver.ubuntu.com
+mysql_repo_key_server: 'keyserver.ubuntu.com'
 ```
 
 The keyserver to provide the GPG key for Debian/Ubuntu.
@@ -109,13 +109,13 @@ The name of the daemon under which MySQL runs. Typically this can be omitted sin
 based on the target operating system. For RedHat/CentOS this is `mysqld` and Debian/Ubuntu it's `mysql`.
 
 ```
-mysql_service_state: started
+mysql_service_state: 'started'
 ```
 
 The desired MySQL service state, valid values are `started`, `stopped`, `restarted` or `reloaded`.
 
 ```
-mysql_service_enabled: yes
+mysql_service_enabled: 'yes'
 ```
 
 Whether the MySQL service should start on boot, valid values are `yes`, or `no`.
@@ -134,13 +134,13 @@ If the value remains omitted, the following packages will be installed by defaul
 | mariadb-server         | MariaDB-server          |
 
 ```
-mysql_pid_path: /var/run/mysqld
+mysql_pid_path: '/var/run/mysqld'
 ```
 
 The location for storing MySQL pid files.
 
 ```
-mysql_log_path: /var/log/mysql
+mysql_log_path: '/var/log/mysql'
 ```
 
 The location for storing MySQL log files.
@@ -159,7 +159,7 @@ mysql_global_config_file_refresh: no
 Whether to refresh the MySQL configuration file by overriding it with the contents with `mysql_global_config_template`.
 
 ```
-mysql_global_config_template: my.cnf.j2
+mysql_global_config_template: 'my.cnf.j2'
 ```
 
 The name of the MySQL configuration template. Typically you won't need to override this value since it's only used
@@ -175,28 +175,34 @@ the name of the option and can be omitted if adding/removing a whole section. Th
 value to be associated with an option, this can also be omitted when removing an option.
 
 ```
-mysql_root_config_file: /root/.my.cnf
+mysql_root_config_file: '/root/.my.cnf'
 ```
 
 The file name of the root user MySQL configuration file.
 
 ```
-mysql_root_config_template: root.my.cnf.j2
+mysql_root_config_template: 'root.my.cnf.j2'
 ```
 
 The name of the root user MySQL configuration template.
 
 ```
-mysql_root_username: root
+mysql_root_username: 'root'
 ```
 
 The MySQL root user account username.
 
 ```
-mysql_root_password: ''
+mysql_root_password: 'root'
 ```
 
 The MySQL root user account password.
+
+```
+mysql_old_root_password: ''
+```
+
+The old MySQL root user account password.
 
 ```
 mysql_update_root_password: no
