@@ -96,7 +96,7 @@
     login_user: '{{ mysql_root_username }}'
     login_password: '{{ mysql_old_root_password }}'
   with_items: '{{ mysql_root_hosts.stdout_lines }}'
-  when: '{{ mysql_update_root_password or (mysql_debian_installed_packages.changed == true) or (mysql_redhat_installed_packages.changed == true) }}'
+  when: '{{ mysql_update_root_password or mysql_debian_installed_packages.changed == true or mysql_redhat_installed_packages.changed == true }}'
 
 - name: 'MySQL | Update the root config file with credentials.'
   become: yes
