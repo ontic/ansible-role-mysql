@@ -87,10 +87,6 @@
   register: 'mysql_anonymous_hosts'
   changed_when: false
 
-- debug: var=mysql_update_root_password
-- debug: var=mysql_debian_installed_packages
-- debug: var=mysql_redhat_installed_packages
-
 - name: 'MySQL | Update the root user password.'
   become: yes
   mysql_user:
@@ -100,7 +96,7 @@
     login_user: '{{ mysql_root_username }}'
     login_password: '{{ mysql_old_root_password }}'
   with_items: '{{ mysql_root_hosts.stdout_lines }}'
-  when: '{{ mysql_update_root_password or (mysql_debian_installed_packages is defined and mysql_debian_installed_packages.changed) or (mysql_redhat_installed_packages is defined and mysql_redhat_installed_packages.changed) }}'
+  when: '{{ mysql_update_root_password or (mysql_debian_installed_packages is defined and mysql_debian_installed_packages.changed == true) or (mysql_redhat_installed_packages is defined and mysql_redhat_installed_packages.changed == true) }}'
 
 - name: 'MySQL | Update the root config file with credentials.'
   become: yes
