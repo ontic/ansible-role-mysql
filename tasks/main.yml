@@ -1,9 +1,5 @@
-# This source file is subject to the (Open Source Initiative) BSD license
-# that is bundled with this package in the LICENSE file. It is also available
-# through the world-wide-web at this URL: http://www.ontic.com.au/license.html
-# If you did not receive a copy of the license and are unable to obtain it through
-# the world-wide-web, please send an email to license@ontic.com.au immediately.
-# Copyright (c) 2010-2016 Ontic. (http://www.ontic.com.au). All rights reserved.
+# Copyright (c) Ontic. (http://www.ontic.com.au). All rights reserved.
+# See the COPYING file bundled with this package for license details.
 
 ---
 
@@ -21,7 +17,7 @@
 - name: 'MySQL | Define MySQL service name.'
   set_fact:
     mysql_service_name: '{{ mysql_default_service_name }}'
-  when: '{{ not mysql_service_name }}'
+  when: 'not mysql_service_name'
   tags:
     - 'mysql'
     - 'mysql-package'
@@ -34,7 +30,7 @@
 - name: 'MySQL | Define MySQL packages.'
   set_fact:
     mysql_packages: '{{ mysql_default_packages }}'
-  when: '{{ not mysql_packages }}'
+  when: 'not mysql_packages'
   tags:
     - 'mysql'
     - 'mysql-package'

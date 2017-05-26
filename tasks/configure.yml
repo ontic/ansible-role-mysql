@@ -1,9 +1,5 @@
-# This source file is subject to the (Open Source Initiative) BSD license
-# that is bundled with this package in the LICENSE file. It is also available
-# through the world-wide-web at this URL: http://www.ontic.com.au/license.html
-# If you did not receive a copy of the license and are unable to obtain it through
-# the world-wide-web, please send an email to license@ontic.com.au immediately.
-# Copyright (c) 2010-2016 Ontic. (http://www.ontic.com.au). All rights reserved.
+# Copyright (c) Ontic. (http://www.ontic.com.au). All rights reserved.
+# See the COPYING file bundled with this package for license details.
 
 ---
 
@@ -12,7 +8,7 @@
   service:
     name: '{{ mysql_service_name }}'
     state: 'stopped'
-  when: '{{ not mysql_installed.stat.exists or mysql_resize_innodb_log_files }}'
+  when: 'not mysql_installed.stat.exists or mysql_resize_innodb_log_files'
 
 - name: 'MySQL | Delete InnoDB log files when resizing.'
   become: yes
@@ -22,7 +18,7 @@
   with_items:
     - '/var/lib/mysql/ib_logfile0'
     - '/var/lib/mysql/ib_logfile1'
-  when: '{{ not mysql_installed.stat.exists or mysql_resize_innodb_log_files }}'
+  when: 'not mysql_installed.stat.exists or mysql_resize_innodb_log_files'
 
 - name: 'MySQL | Replace the global config file.'
   become: yes
@@ -34,7 +30,7 @@
     group: 'root'
     mode: '0644'
   notify: 'restart mysql'
-  when: '{{ mysql_global_config_template | default(None) != None }}'
+  when: 'mysql_global_config_template | default(None) != None'
 
 - name: 'MySQL | Configure properties in global config file.'
   become: yes
@@ -49,7 +45,7 @@
     mode: '0644'
   notify: 'restart mysql'
   with_items: '{{ mysql_global_config }}'
-  when: '{{ mysql_global_config | default(None) != None }}'
+  when: 'mysql_global_config | default(None) != None'
 
 - name: 'MySQL | Set ownership of directories.'
   become: yes
@@ -62,7 +58,7 @@
   with_items:
     - '{{ mysql_pid_path }}'
     - '{{ mysql_log_path }}'
-  when: '{{ ansible_os_family == "RedHat" }}'
+  when: 'ansible_os_family == "RedHat"'
 
 - name: 'MySQL | Ensure MySQL is started.'
   become: yes
@@ -96,7 +92,7 @@
     login_user: '{{ mysql_root_username }}'
     login_password: '{{ mysql_old_root_password }}'
   with_items: '{{ mysql_root_hosts.stdout_lines }}'
-  when: '{{ mysql_update_root_password or mysql_debian_installed_packages.changed == true or mysql_redhat_installed_packages.changed == true }}'
+  when: 'mysql_update_root_password or mysql_debian_installed_packages.changed == true or mysql_redhat_installed_packages.changed == true'
 
 - name: 'MySQL | Update the root config file with credentials.'
   become: yes
@@ -146,7 +142,7 @@
     state: '{{ item.state | default(omit) }}'
     update_password: '{{ item.update_password | default(omit) }}'
   with_items: '{{ mysql_users }}'
-  when: '{{ mysql_users | default(None) != None }}'
+  when: 'mysql_users | default(None) != None'
 
 - name: 'MySQL | Configure databases.'
   become: yes
@@ -169,4 +165,4 @@
     state: '{{ item.state | default(omit) }}'
     target: '{{ item.target | default(omit) }}'
   with_items: '{{ mysql_databases }}'
-  when: '{{ mysql_databases | default(None) != None }}'
+  when: 'mysql_databases | default(None) != None'
