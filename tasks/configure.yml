@@ -94,8 +94,16 @@
 - name: 'MySQL | Update the root user password.'
   become: yes
   shell: 'mysql -u root -NBe ''ALTER USER "{{ mysql_root_username }}"@"{{ item }}" IDENTIFIED WITH mysql_native_password BY "{{ mysql_root_password }}";'''
+  ignore_errors: yes
+  register: 'mysql_update_root_password_result'
   with_items: '{{ mysql_root_hosts.stdout_lines | default([]) }}'
   when: 'mysql_update_root_password or mysql_debian_installed_packages.changed == true or mysql_redhat_installed_packages.changed == true'
+
+- name: 'MySQL | Update the root user password.'
+  become: yes
+  shell: 'mysql -NBe ''SET PASSWORD FOR "{{ mysql_root_username }}"@"{{ item }}" = PASSWORD("{{ mysql_root_password }}");'''
+  with_items: '{{ mysql_root_hosts.stdout_lines | default([]) }}'
+  when: 'mysql_update_root_password_result is defined and mysql_update_root_password_result.failed == true'
 
 #- name: 'MySQL | Update the root user password.'
 #  become: yes
