@@ -60,13 +60,22 @@
   register: 'mysql_repo_added'
   when: 'ansible_os_family == "RedHat" and mysql_repo_state | default("present") == "present"'
 
+- name: 'MySQL | Ubuntu | Install MySQL Python package.'
+  become: yes
+  apt:
+    name: 'python-mysqldb'
+    state: 'present'
+  when: 'ansible_distribution == "Ubuntu"'
+
 - name: 'MySQL | Debian | Install MySQL Python package.'
   become: yes
   apt:
-    pkg: 'python-mysqldb'
+    name: '{{ item }}'
     state: 'present'
-    allow_unauthenticated: yes
-  when: 'ansible_os_family == "Debian"'
+  with_items:
+    - 'python3-dev'
+    - 'libmysqlclient-dev'
+  when: 'ansible_distribution == "Debian"'
 
 - name: 'MySQL | RedHat | Install MySQL Python package.'
   become: yes
