@@ -103,7 +103,7 @@
   become: yes
   shell: 'mysql -u root -NBe ''ALTER USER "{{ mysql_root_username }}"@"{{ item }}" IDENTIFIED WITH mysql_native_password BY "{{ mysql_root_password }}";'''
   with_items: '{{ mysql_root_hosts.stdout_lines | default([]) }}'
-  when: 'mysql_update_root_password_result is defined and mysql_update_root_password_result.failed == true'
+  when: 'mysql_update_root_password_result is defined and mysql_update_root_password_result | failed'
 
 #- name: 'MySQL | Update the root user password.'
 #  become: yes
