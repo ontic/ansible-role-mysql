@@ -4,5 +4,19 @@
 ---
 
 - hosts: 'localhost'
+  vars:
+    mysql_users:
+      - name: 'deployer'
+        host: '%'
+        password: 'strong-password'
+        priv: 'my-database.*:ALL'
+      - name: 'oldclient'
+        state: 'absent'
+    mysql_databases:
+      - name: 'application_database'
+        encoding: 'utf8'
+        collation: 'utf8_general_ci'
+      - name: 'old_database'
+        state: 'absent'
   roles:
     - { role: 'role_under_test' }
