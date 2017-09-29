@@ -3,6 +3,13 @@
 
 ---
 
+- name: 'MySQL | Debian | Install HTTPS transport.'
+  become: yes
+  apt:
+    name: 'apt-transport-https'
+    state: 'present'
+  when: 'ansible_os_family == "Debian"'
+
 - name: 'MySQL | Debian | Add launchpad PPA.'
   become: yes
   apt_repository:
