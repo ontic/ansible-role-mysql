@@ -74,7 +74,7 @@
     state: 'present'
   with_items:
     - 'python3-pip'
-    - 'python3-mysqldb'
+    - 'libmysqlclient-dev'
   when: 'ansible_distribution == "Debian"'
 
 - name: 'MySQL | Debian | Install MySQL Python package.'
