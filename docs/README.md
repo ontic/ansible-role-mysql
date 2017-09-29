@@ -3,7 +3,7 @@
 ## Example
 
 ```
-mysql_version: '10.1'
+mysql_version: '10.2'
 mysql_root_password: 'root-password'
 mysql_global_config:
   - { section: 'client', option: 'port', value: '3306' }
@@ -36,7 +36,7 @@ mysql_ppa:
 The launchpad PPA to add to APT. Which would allow a non-official package of MySQL to be installed.
 
 ```
-mysql_version: '10.1'
+mysql_version: '10.2'
 ```
 
 The MySQL package version you want to install.
