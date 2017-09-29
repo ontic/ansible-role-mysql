@@ -70,11 +70,8 @@
 - name: 'MySQL | Debian | Install MySQL Python package.'
   become: yes
   apt:
-    name: '{{ item }}'
+    name: 'python3-mysqldb'
     state: 'present'
-  with_items:
-    - 'python3-dev'
-    - 'libmysqlclient-dev'
   when: 'ansible_distribution == "Debian"'
 
 - name: 'MySQL | RedHat | Install MySQL Python package.'
