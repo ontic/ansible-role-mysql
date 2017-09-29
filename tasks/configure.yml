@@ -100,6 +100,13 @@
   with_items: '{{ mysql_root_hosts.stdout_lines | default([]) }}'
   when: 'mysql_update_root_password_result is defined and mysql_update_root_password_result | failed'
 
+- name: 'MySQL | Restart MySQL after changing password.'
+  become: yes
+  service:
+    name: '{{ mysql_service_name }}'
+    state: 'restarted'
+  when: 'mysql_update_root_password_result is defined'
+
 #- name: 'MySQL | Update the root user password.'
 #  become: yes
 #  mysql_user:
