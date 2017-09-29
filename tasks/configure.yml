@@ -133,6 +133,8 @@
   mysql_db:
     name: 'test'
     state: 'absent'
+    login_user: '{{ mysql_root_username }}'
+    login_password: '{{ mysql_root_password }}'
 
 - name: 'MySQL | Configure users.'
   become: yes
