@@ -12,7 +12,7 @@ mysql_repo_baseurl: 'http://yum.mariadb.org/{{ mysql_version }}/centos/{{ ansibl
 mysql_repo_gpgkey: 'https://yum.mariadb.org/RPM-GPG-KEY-MariaDB'
 mysql_repo_gpgcheck: '1'
 mysql_repo_enabled: '1'
-mysql_repo_url: 'deb http://mariadb.mirror.digitalpacific.com.au/repo/{{ mysql_version }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} main'
+mysql_repo_url: 'deb http://mariadb.mirror.digitalpacific.com.au/repo/{{ mysql_version }}/{{ ansible_distribution | lower }} {{ "artful" if ansible_distribution_release | lower == "bionic" else ansible_distribution_release | lower }} main'
 mysql_repo_key_id: '0xF1656F24C74CD1D8'
 mysql_repo_key_server: 'keyserver.ubuntu.com'
 mysql_service_name:

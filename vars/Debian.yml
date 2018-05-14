@@ -4,8 +4,8 @@
 ---
 
 mysql_default_packages:
-  - name: 'mariadb-client'
-  - name: 'mariadb-server'
+  - name: 'mariadb-client-{{ mysql_version }}'
+  - name: 'mariadb-server-{{ mysql_version }}'
 
 mysql_default_service_name: 'mysql'
 mysql_global_config_file: '/etc/mysql/my.cnf'
