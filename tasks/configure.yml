@@ -68,12 +68,16 @@
 
 - name: 'MySQL | Prevent root login remotely.'
   become: yes
-  command: 'mysql -NBe ''DELETE FROM mysql.user WHERE User="root" AND Host NOT IN ("localhost", "127.0.0.1", "::1")'''
+  shell: 'mysql -NBe ''DELETE FROM mysql.user WHERE User="root" AND Host NOT IN ("localhost", "127.0.0.1", "::1")'''
+  environment:
+    HOME: '/root'
   changed_when: false
 
 - name: 'MySQL | Retrieve the root user hosts.'
   become: yes
-  command: 'mysql -NBe ''SELECT Host FROM mysql.user WHERE User = "{{ mysql_root_username }}" ORDER BY (host="localhost") ASC'''
+  shell: 'mysql -NBe ''SELECT Host FROM mysql.user WHERE User = "{{ mysql_root_username }}" ORDER BY (host="localhost") ASC'''
+  environment:
+    HOME: '/root'
   register: 'mysql_root_hosts'
   changed_when: false
   check_mode: no
@@ -81,7 +85,9 @@
 
 - name: 'MySQL | Retrieve the anonymous user hosts.'
   become: yes
-  command: 'mysql -NBe ''SELECT Host FROM mysql.user WHERE User = ""'''
+  shell: 'mysql -NBe ''SELECT Host FROM mysql.user WHERE User = ""'''
+  environment:
+    HOME: '/root'
   register: 'mysql_anonymous_hosts'
   changed_when: false
   check_mode: no
@@ -89,14 +95,18 @@
 - name: 'MySQL | Update the root user password.'
   become: yes
   shell: 'mysql -NBe ''SET PASSWORD FOR "{{ mysql_root_username }}"@"{{ item }}" = PASSWORD("{{ mysql_root_password }}");'''
+  environment:
+    HOME: '/root'
   ignore_errors: yes
   register: 'mysql_update_root_password_result'
   with_items: '{{ mysql_root_hosts.stdout_lines | default([]) }}'
-  when: 'mysql_update_root_password or mysql_debian_installed_packages.changed == true or mysql_redhat_installed_packages.changed == true'
+  when: 'mysql_old_root_password or mysql_debian_installed_packages.changed == true or mysql_redhat_installed_packages.changed == true'
 
 - name: 'MySQL | Update the root user password if failed.'
   become: yes
   shell: 'mysql -u root -NBe ''ALTER USER "{{ mysql_root_username }}"@"{{ item }}" IDENTIFIED WITH mysql_native_password BY "{{ mysql_root_password }}";'''
+  environment:
+    HOME: '/root'
   with_items: '{{ mysql_root_hosts.stdout_lines | default([]) }}'
   when: 'mysql_update_root_password_result is defined and mysql_update_root_password_result is failed'
 
