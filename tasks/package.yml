@@ -125,3 +125,9 @@
   register: 'mysql_redhat_installed_packages'
   with_items: '{{ mysql_packages }}'
   when: 'ansible_os_family == "RedHat"'
+
+- name: 'MySQL | RedHat | Reload systemd.'
+  become: yes
+  command: 'systemctl daemon-reload'
+  when: 'ansible_os_family == "RedHat" and ansible_distribution_version == 7 and not mysql_installed.stat.exists'
+  
