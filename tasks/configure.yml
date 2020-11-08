@@ -8,8 +8,8 @@
   systemd:
     name: '{{ mysql_service_name }}'
     state: 'stopped'
-    daemon_reload: {{ ansible_os_family == "RedHat" and ansible_distribution_version == 7 | bool }}
-  when: 'not mysql_installed.stat.exists or mysql_resize_innodb_log_files)'
+    daemon_reload: '{{ ansible_os_family == "RedHat" and ansible_distribution_version == 7 | bool }}'
+  when: 'not mysql_installed.stat.exists or mysql_resize_innodb_log_files'
 
 - name: 'MySQL | Delete InnoDB log files when resizing.'
   become: yes
