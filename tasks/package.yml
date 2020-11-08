@@ -129,5 +129,5 @@
 - name: 'MySQL | RedHat | Reload systemd.'
   become: yes
   command: 'systemctl daemon-reload'
-  when: 'ansible_os_family == "RedHat" and ansible_distribution_version == 7 and not mysql_installed.stat.exists'
+  when: 'ansible_os_family == "RedHat" and mysql_redhat_installed_packages.changed == true'
   
