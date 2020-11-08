@@ -1,0 +1,13 @@
+# Copyright (c) Ontic. (http://www.ontic.com.au). All rights reserved.
+# See the COPYING file bundled with this package for license details.
+
+---
+
+mysql_default_packages:
+  - name: 'mariadb-client-{{ mysql_version }}'
+  - name: 'mariadb-server-{{ mysql_version }}'
+
+mysql_default_service_name: 'mysql'
+mysql_global_config_file: '/etc/mysql/my.cnf'
+mysql_socket: '/var/run/mysqld/mysqld.sock'
+mysql_python_package_debian: 'python3-mysqldb'
