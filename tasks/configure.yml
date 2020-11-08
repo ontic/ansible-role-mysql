@@ -18,7 +18,7 @@
   with_items:
     - '/var/lib/mysql/ib_logfile0'
     - '/var/lib/mysql/ib_logfile1'
-  when: 'not mysql_installed.stat.exists or mysql_resize_innodb_log_files'
+  when: 'mysql_redhat_installed_packages.changed == true or mysql_resize_innodb_log_files'
 
 - name: 'MySQL | Replace the global config file.'
   become: yes
