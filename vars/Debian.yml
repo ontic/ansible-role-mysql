@@ -10,3 +10,4 @@ mysql_default_packages:
 mysql_default_service_name: 'mysql'
 mysql_global_config_file: '/etc/mysql/my.cnf'
 mysql_socket: '/var/run/mysqld/mysqld.sock'
+mysql_python_package_debian: 'python-mysqldb'
