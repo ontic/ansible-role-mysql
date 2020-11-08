@@ -15,6 +15,7 @@ mysql_repo_enabled: '1'
 mysql_repo_url: 'deb http://mariadb.mirror.digitalpacific.com.au/repo/{{ mysql_version }}/{{ ansible_distribution | lower }} {{ "artful" if ansible_distribution_release | lower == "bionic" else ansible_distribution_release | lower }} main'
 mysql_repo_key_id: '0xF1656F24C74CD1D8'
 mysql_repo_key_server: 'keyserver.ubuntu.com'
+mysql_python_package_debian: 'python3-mysqldb'
 mysql_service_name:
 mysql_service_state: 'started'
 mysql_service_enabled: 'yes'
