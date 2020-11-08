@@ -4,7 +4,7 @@
 ---
 
 mysql_ppa:
-mysql_version: '10.2'
+mysql_version: '10.5'
 mysql_repo_state: 'present'
 mysql_repo_uid: 'mariadb'
 mysql_repo_name: 'MariaDB'
