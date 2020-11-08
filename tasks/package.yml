@@ -63,7 +63,7 @@
 - name: 'MySQL | Ubuntu | Install MySQL Python package.'
   become: yes
   apt:
-    name: 'python-mysqldb'
+    name: '{{ mysql_python_package_debian }}'
     state: 'present'
   when: 'ansible_distribution == "Ubuntu"'
 
